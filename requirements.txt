@@ -1,0 +1,7 @@
+hanlp
+penman
+fastapi
+uvicorn[standard]
+pydantic
+networkx
+confluent-kafka
