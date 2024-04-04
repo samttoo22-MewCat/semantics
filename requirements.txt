@@ -1,4 +1,4 @@
-hanlp
+hanlp[full]
 penman
 fastapi
 uvicorn[standard]
