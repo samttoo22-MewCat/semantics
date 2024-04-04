@@ -17,10 +17,15 @@ async def perform_tokenise(request: NLPRequest):
   result = await nlp_service.tokenise(request.text)
   return NLPResponse(result=result)
 
-@router.post("/amr-en", response_model=NLPResponse)
-async def perform_tokenise(request: NLPRequest):
+@router.post("/amr-en")
+async def perform_amr_en(request: NLPRequest):
   result = await nlp_service.parse_amr_en(request.text)
-  return NLPResponse(result=result)
+  return result
+
+@router.post("/amr-zh")
+async def perform_amr_zh(request: NLPRequest):
+  result = await nlp_service.parse_amr_zh(request.text)
+  return result
 
 @router.post("/con", response_model=NLPResponse)
 async def perform_con(request: NLPRequest):

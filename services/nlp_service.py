@@ -6,9 +6,9 @@ from hanlp_common import document
 from nlp.utils import nlp_utils
 
 hanlp_model = hanlp.load(hanlp.pretrained.mtl.CLOSE_TOK_POS_NER_SRL_UDEP_SDP_CON_ELECTRA_SMALL_ZH)
-
-amr_parser = hanlp.load(hanlp.pretrained.amr.AMR3_SEQ2SEQ_BART_LARGE)
-
+tok = hanlp.load(hanlp.pretrained.tok.COARSE_ELECTRA_SMALL_ZH)
+amr_parser_en = hanlp.load(hanlp.pretrained.amr.AMR3_SEQ2SEQ_BART_LARGE)
+amr_parser_zh = hanlp.load(hanlp.pretrained.amr.MRP2020_AMR_ENG_ZHO_XLM_BASE)
 class NLPService:
   # Constituency parsing
   async def con(self, text: str) -> str:
@@ -48,7 +48,7 @@ class NLPService:
   # Tokenise (HanLP model)
   async def tokenise(self, text: str) -> document.Document:
     print("- Tokenise...")
-    result = hanlp_model([text])
+    result = tok([text])
     return result
   
   # Abstract Meaning Representation (English)
@@ -70,3 +70,17 @@ class NLPService:
 
     print(type(graph_json))
     return graph_json
+
+  # Abstract Meaning Representation (Chinese)
+  async def parse_amr_zh(self, text: str):
+    # Plain Text -> Tokenise
+    print("- Tokenising first...")
+    tok_result = tok([text])
+
+    # Tokenised -> AMR String
+    print("- Parsing AMR...")
+    amr_string = amr_parser_zh(tok_result, output_amr=False)
+    print("-- Parsed AMR:")
+    print(amr_string)
+    
+    return amr_string
