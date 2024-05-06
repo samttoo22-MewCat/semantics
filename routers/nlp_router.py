@@ -46,3 +46,9 @@ async def perform_sdp(request: NLPRequest):
 async def perform_ud(request: NLPRequest):
   result = await nlp_service.ud(request.text)
   return NLPResponse(result=result)
+
+@router.post("/pos", response_model=NLPResponse)
+async def perform_pos(request: NLPRequest):
+  result = await nlp_service.pos(request.text)
+
+  return NLPResponse(result=str(result))

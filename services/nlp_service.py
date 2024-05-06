@@ -4,11 +4,15 @@ import penman
 from hanlp import hanlp
 from hanlp_common import document
 from nlp.utils import nlp_utils
+import jieba
+jieba.load_userdict('wiki2jieba_user_dict.txt')
+print('自定義辭典載入完成。')
 
 hanlp_model = hanlp.load(hanlp.pretrained.mtl.CLOSE_TOK_POS_NER_SRL_UDEP_SDP_CON_ELECTRA_SMALL_ZH)
 tok = hanlp.load(hanlp.pretrained.tok.COARSE_ELECTRA_SMALL_ZH)
 amr_parser_en = hanlp.load(hanlp.pretrained.amr.AMR3_SEQ2SEQ_BART_LARGE)
-amr_parser_zh = hanlp.load(hanlp.pretrained.amr.MRP2020_AMR_ENG_ZHO_XLM_BASE)
+amr_parser_zh = hanlp.load(hanlp.pretrained.amr.MRP2020_AMR_ZHO_MENGZI_BASE)
+pos_parser_zh = hanlp.load(hanlp.pretrained.pos.PKU_POS_ELECTRA_SMALL)
 class NLPService:
   # Constituency parsing
   async def con(self, text: str) -> str:
@@ -38,7 +42,17 @@ class NLPService:
   # Part-of-Speech tagging
   async def pos(self, text: str) -> str:
     print("- Parsing pos...")
-    return hanlp_model.tasks.pos(text)
+    def ws_zh(text):
+      list = jieba.lcut(text)
+      return list
+
+    split_string = ws_zh(text)
+    pos_result = pos_parser_zh(split_string)
+
+    result = []
+    for s in range(len(pos_result)):
+        result.append(split_string[s] + "_" + pos_result[s])
+    return result
   
   # Named Entity Recognition
   async def parse_ner(self, text: str) -> str:
@@ -56,7 +70,7 @@ class NLPService:
     print("- Parsing AMR...")
 
     # Plain Text -> AMR String
-    amr_string = amr_parser(text)
+    amr_string = amr_parser_en(text)
     print("-- Parsed AMR:")
     print(amr_string)
     
